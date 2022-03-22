@@ -1,0 +1,10 @@
+server:
+  port: :8086
+datasource:
+  driverName: mysql
+  userName: root
+  password: 12345678
+  host: 127.0.0.1
+  port: 3306
+  DBName: milktea
+  charset: utf8
