@@ -53,3 +53,4 @@ func RegisterService(user *User)(error){
 		return nil
 	}
 }
+

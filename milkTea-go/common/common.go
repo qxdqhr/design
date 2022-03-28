@@ -17,13 +17,31 @@ func GetUid(role,telephone string)(string){
 	return ""
 }
 
-func Response(ctx *gin.Context,httpStatus int,code int,msg string,data gin.H){
-	ctx.JSON(httpStatus,gin.H{"code":code, "msg":msg, "data":data,})
+func GetCustomerid(username string)(string){
+	return "C_" + username
 }
-func Success(ctx *gin.Context,msg string,data gin.H){
+
+func Response(ctx *gin.Context,httpStatus int,code int,msg string,data interface{}) {
+	ctx.JSON(httpStatus, gin.H{
+		"code": code,
+		"msg":  msg,
+		"data": data,
+	})
+}
+func ResponseDatas(ctx *gin.Context,httpStatus int,code int,msg string,datas interface{}){
+	ctx.IndentedJSON(httpStatus,gin.H{
+		"code": code,
+		"msg":  msg,
+		"data": datas,
+	})
+}
+func SuccessDatas(ctx *gin.Context,msg string,datas interface{}){
+	ResponseDatas(ctx,http.StatusOK,200,msg,datas)
+}
+func Success(ctx *gin.Context,msg string,data interface{}){
 	Response(ctx,http.StatusOK,200,msg,data)
 }
-func Fail(ctx *gin.Context,msg string,data gin.H){
+func Fail(ctx *gin.Context,msg string,data interface{}){
 	Response(ctx,http.StatusBadRequest,400,msg,data)
 }
 

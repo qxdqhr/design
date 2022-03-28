@@ -17,10 +17,10 @@ func Routers(r *gin.Engine){
 
 	order:=r.Group("/order/")
 	{
-		order.POST("/addorder",addOrderFunc)
-		order.POST("/queryorder",queryOrderFunc)
-		order.POST("/deleteorder",deleteFunc)
-		order.POST("/modifyorder",modifyOrderFunc)
+		order.POST("/add",addOrderFunc)
+		order.POST("/query",queryOrderFunc)
+		order.POST("/delete",deleteFunc)
+		order.POST("/modify",modifyOrderFunc)
 		order.POST("/refresh",refreshFunc)
 	}
 

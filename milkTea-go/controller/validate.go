@@ -3,6 +3,8 @@ package controller
 import (
 	"fmt"
 	"milkTea/service"
+	"strconv"
+	"strings"
 )
 
 func registerValidate(user service.User)(error){
@@ -41,10 +43,84 @@ func loginValidate(user service.User)(error){
 
 func orderValidate(order service.Order)(error){
 	if len(order.CustomerId)<=0 {
-		fmt.Errorf("username invalid")
+		return fmt.Errorf("consumerName invalid")
 	}
-	if len(order.CustomerId)<=0 {
-		fmt.Errorf("username invalid")
+	if len(order.Buyingjuice)<=0 {
+		return fmt.Errorf("Buyingjuice invalid")
+	}
+	if len(order.JuiceNumber)<=0 {
+		return fmt.Errorf("JuiceNumber invalid")
+	}
+	if len(order.OrderingTime)<=0 {
+		return fmt.Errorf("OrderingTime invalid")
+	}
+	if len(order.TotalSellingPrice)<=0 {
+		return fmt.Errorf("TotalSellingPrice invalid")
+	}
+	if !(order.CurEvaluate == "好评" ||order.CurEvaluate == "中评" || order.CurEvaluate == "差评") {
+		return fmt.Errorf("Buyingjuice invalid")
+	}
+	return nil
+}
+func orderQueryValidate(query *service.Query)(error){
+	fmt.Print(query)
+	if query.Func != "order" {
+		return fmt.Errorf("func failed")
+	}
+	switch query.QueryName{
+	case  "顾客名":
+		if len(query.QueryValue) == 0 {
+			return fmt.Errorf("顾客名称错误")
+		}
+		break
+	case  "购买饮品":
+		times := strings.Split(query.QueryValue,"｜")
+		if len(times) == 0 {
+			return fmt.Errorf("饮品格式错误")
+		}
+		for _,val := range times{
+			juiceToNum := strings.Split(val,":")
+			if len(juiceToNum) == 0 {
+				return fmt.Errorf("饮品格式错误")
+			}
+			if juiceToNum[0]=="" {
+				return fmt.Errorf("饮品格式错误")
+			}
+			if _,err := strconv.ParseInt(juiceToNum[1],10,64);err!=nil{
+				return fmt.Errorf("饮品格式错误"+err.Error())
+			}
+		}
+		break
+	case  "下单时间":
+		times := strings.Split(query.QueryValue,"/")
+		if len(times) == 0 {
+			return fmt.Errorf("时间格式错误")
+		}
+		for _,val := range times{
+			_,err := strconv.ParseInt(val,10,64)
+			if err!=nil {
+				return fmt.Errorf("时间格式错误")
+			}
+		}
+		break
+	case  "本单饮品数量":
+		if  _,err := strconv.ParseInt(query.QueryValue,10,64);err!=nil {
+			return fmt.Errorf("数量格式错误")
+		}
+		break
+	case  "总售价":
+		if  _,err := strconv.ParseInt(query.QueryValue,10,64);err!=nil {
+			return fmt.Errorf("价格格式错误")
+		}
+		break
+	case "本单评价":
+		if !(query.QueryValue == "好评" ||query.QueryValue == "中评" || query.QueryValue == "差评"){
+			return fmt.Errorf("查询格式错误")
+		}
+		break
+	case "" :
+		return fmt.Errorf("查询格式错误")
+		break
 	}
 	return nil
 }

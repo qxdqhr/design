@@ -5,13 +5,12 @@ import (
 )
 
 type Owner struct {
-	gorm.Model
+	gorm.Model `json:"-"`
 	Userid    string `json:"userid"`
 	AlertTimes int `json:"alert_times"`
 	RecentReason string `json:"recent_reason"`
 	ExOwnerUserid string `json:"exowneruserid"`
 }
-
 
 
 

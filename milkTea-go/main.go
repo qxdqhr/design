@@ -14,19 +14,37 @@ func init(){
 }
 func MakeDB(){
 	db:=common.GetDB()
-	db=db.AutoMigrate(&service.Owner{})
-	db=db.AutoMigrate(&service.OwnerInputExpense{})
-	db=db.AutoMigrate(&service.Customer{})
-	db=db.AutoMigrate(&service.Order{})
+	//db=db.AutoMigrate(&service.Owner{})
+	//db=db.AutoMigrate(&service.OwnerInputExpense{})
+	//db=db.AutoMigrate(&service.Customer{})
+	//db=db.AutoMigrate(&service.Order{})
 	db=db.AutoMigrate(&service.Juice{})
-	db=db.AutoMigrate(&service.Material{})
-	db=db.AutoMigrate(&service.MaterialJuice{})
-	db=db.AutoMigrate(&service.Alert{})
-	db=db.AutoMigrate(&service.User{})
+	//db=db.AutoMigrate(&service.Material{})
+	//db=db.AutoMigrate(&service.MaterialJuice{})
+	//db=db.AutoMigrate(&service.Alert{})
+	//db=db.AutoMigrate(&service.User{})
+	//j:=service.Juice{
+	//	JuiceId:           "",
+	//	JuiceName:         "bbb",
+	//	JuiceType:         "bbb",
+	//	LastOrderingTime:  "2022/3/17",
+	//	Price:             "15.2",
+	//	Profit:            "",
+	//	Cost:              "",
+	//	CurEvaluate:       "好评",
+	//	JuiceSoldNumber:   "0",
+	//	SellingTotalPrice: "0",
+	//	GoodEvaluateNum:   "1",
+	//}
+	//db.Create(&j)
 }
-func main(){
+func RunDemo(){
 	r:=gin.Default()
 	controller.Routers(r)
 	r.Run(viper.GetString("server.port"))
-	//service.MakeDB()
+}
+
+func main(){
+	RunDemo()
+	//MakeDB()
 }
