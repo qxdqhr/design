@@ -2,15 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"milkTea/common"
 	"strconv"
 	"strings"
 )
 
 type Juice struct {
-	gorm.Model
-	JuiceId     string `json:"juice_id"`
+	JuiceId     string `json:"id"`
 	JuiceName string `json:"juice_name"`
 	JuiceType string `json:"juice_type"`
 	LastOrderingTime string `json:"last_ordering_time"`
@@ -27,8 +25,10 @@ func parseJuiceInfo(order *Order) map[string]string{
 	//aaa:1
 	juiceNumMap:= make(map[string]string)
 	juices := strings.Split(order.Buyingjuice,"|")
+	fmt.Println(juices)
 	for  j:=0;j< len(juices);j++{
 		juice := strings.Split(juices[j],":")
+		fmt.Println(juice)
 		juiceNumMap[juice[0]] = juice[1]
 	}
 	fmt.Println(juiceNumMap)

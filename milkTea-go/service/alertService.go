@@ -1,9 +1,7 @@
 package service
 
-import "github.com/jinzhu/gorm"
-
 type Alert struct {
-	gorm.Model
+	Id string `json:"id"`
 	AlertId string      `json:"alert_id"`
 	AlertReason  string `json:"alert_reason"`
 	AlertMethod  string `json:"alert_method"`

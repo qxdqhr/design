@@ -1,9 +1,7 @@
 package service
 
-import "github.com/jinzhu/gorm"
-
 type OwnerInputExpense struct {
-	gorm.Model
+	Id string `json:"id"`
 	Userid    string `json:"userid" gorm:"primaryKey"`
 	Month      string `json:"month"`
 	TotalIncome string `json:"total_income"`

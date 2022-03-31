@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	//json "encoding/json"
 	"github.com/gin-gonic/gin"
 	"milkTea/common"
@@ -101,11 +102,76 @@ func queryOrderFunc(ctx *gin.Context){
 }
 
 func deleteFunc(ctx *gin.Context){
+	order:= service.Order{}
+	//获取参数
+	err:=ctx.ShouldBindJSON(&order)
+	if err!=nil{
+		common.Err("bind error")
+		common.Fail(ctx,"bind error",nil)
+		return
+	}
+	//校验信息
+	err = orderValidate(order)
+	if err != nil {
+		common.Fail(ctx,"校验失败 "+err.Error(),nil)
+		return
+	}
+	err = service.DeleteOrderInfo(&order)
 
+	c := service.Customer{
+		Name:           order.CustomerId,
+		CustomerId:     common.GetCustomerid(order.CustomerId),
+		BuyingTime:     order.OrderingTime,
+		RecentEvaluate: order.CurEvaluate,
+	}
+
+	err = service.UpdateCustomerInfo(&c)
+	//向 juice 表中写
+	err = service.UpdateJuiceWithOrder(&order)
+
+	if err != nil {
+		common.Fail(ctx,"更新数据失败 "+err.Error(),nil)
+		return
+	}else {
+		common.Success(ctx,"",nil)
+	}
 }
 
 func modifyOrderFunc(ctx *gin.Context){
+	order:= service.Order{}
+	//获取参数
+	err:=ctx.ShouldBindJSON(&order)
+	if err!=nil{
+		common.Err("bind error")
+		common.Fail(ctx,"bind error",nil)
+		return
+	}
+	fmt.Print(order)
+	//校验信息
+	err = orderValidate(order)
+	if err != nil {
+		common.Fail(ctx,"校验失败 "+err.Error(),nil)
+		return
+	}
+	err = service.ModifyOrderInfo(&order)
 
+	c := service.Customer{
+		Name:           order.CustomerId,
+		CustomerId:     common.GetCustomerid(order.CustomerId),
+		BuyingTime:     order.OrderingTime,
+		RecentEvaluate: order.CurEvaluate,
+	}
+
+	err = service.UpdateCustomerInfo(&c)
+	//向 juice 表中写
+	err = service.UpdateJuiceWithOrder(&order)
+
+	if err != nil {
+		common.Fail(ctx,"修改数据失败 "+err.Error(),nil)
+		return
+	}else {
+		common.Success(ctx,"",nil)
+	}
 }
 
 func refreshFunc(ctx *gin.Context){

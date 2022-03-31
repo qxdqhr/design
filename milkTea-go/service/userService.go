@@ -2,12 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 	"milkTea/common"
 )
 type User struct {
-	gorm.Model
 	Name    string `json:"name"`
 	Userid    string `json:"userid"`
 	Password  string `json:"password"`

@@ -3,7 +3,6 @@ package service
 import "github.com/jinzhu/gorm"
 
 type Material struct {
-	gorm.Model
 	MaterialId               string `json:"material_id"`
 	MaterialName             string `json:"material_name"`       //原料名称
 	MaterialNumber           string `json:"material_number"`       //本次购入原料数量

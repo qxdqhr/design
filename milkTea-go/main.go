@@ -14,15 +14,15 @@ func init(){
 }
 func MakeDB(){
 	db:=common.GetDB()
-	//db=db.AutoMigrate(&service.Owner{})
-	//db=db.AutoMigrate(&service.OwnerInputExpense{})
-	//db=db.AutoMigrate(&service.Customer{})
-	//db=db.AutoMigrate(&service.Order{})
+	db=db.AutoMigrate(&service.Owner{})
+	db=db.AutoMigrate(&service.OwnerInputExpense{})
+	db=db.AutoMigrate(&service.Customer{})
+	db=db.AutoMigrate(&service.Order{})
 	db=db.AutoMigrate(&service.Juice{})
-	//db=db.AutoMigrate(&service.Material{})
-	//db=db.AutoMigrate(&service.MaterialJuice{})
-	//db=db.AutoMigrate(&service.Alert{})
-	//db=db.AutoMigrate(&service.User{})
+	db=db.AutoMigrate(&service.Material{})
+	db=db.AutoMigrate(&service.MaterialJuice{})
+	db=db.AutoMigrate(&service.Alert{})
+	db=db.AutoMigrate(&service.User{})
 	//j:=service.Juice{
 	//	JuiceId:           "",
 	//	JuiceName:         "bbb",

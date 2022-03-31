@@ -2,12 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"milkTea/common"
 )
 
 type Customer struct {
-	gorm.Model
 	Name    string `json:"name"`
 	CustomerId    string `json:"customerid"`
 	BuyingTime string `json:"buying_time"`
