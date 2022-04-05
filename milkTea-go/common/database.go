@@ -2,14 +2,14 @@ package common
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"github.com/spf13/viper"
 )
 
 
 func GetDB()(* gorm.DB){
-	driverName	:=viper.GetString("datasource.driverName")
+	//driverName	:=viper.GetString("datasource.driverName")
 	userName	:=viper.GetString("datasource.userName")
 	password	:=viper.GetString("datasource.password")
 	host		:=viper.GetString("datasource.host")
@@ -25,11 +25,14 @@ func GetDB()(* gorm.DB){
 		charset,
 	)
 
-	DB,err := gorm.Open(driverName,args)
-	DB.SingularTable(true)
+	db, err := gorm.Open(mysql.Open(args), &gorm.Config{})
+
+
+	//,args)
+
 	if err!= nil{
 		Err(err.Error())
 	}
 
-	return DB
+	return db
 }

@@ -30,6 +30,7 @@ func addOrderFunc(ctx *gin.Context){
 		CustomerId:     common.GetCustomerid(order.CustomerId),
 		BuyingTime:     order.OrderingTime,
 		RecentEvaluate: order.CurEvaluate,
+		UserId: order.UserId,
 	}
 
 	err = service.UpdateCustomerInfo(&c)
@@ -101,7 +102,7 @@ func queryOrderFunc(ctx *gin.Context){
 
 }
 
-func deleteFunc(ctx *gin.Context){
+func deleteOrderFunc(ctx *gin.Context){
 	order:= service.Order{}
 	//获取参数
 	err:=ctx.ShouldBindJSON(&order)
@@ -121,16 +122,17 @@ func deleteFunc(ctx *gin.Context){
 	c := service.Customer{
 		Name:           order.CustomerId,
 		CustomerId:     common.GetCustomerid(order.CustomerId),
-		BuyingTime:     order.OrderingTime,
-		RecentEvaluate: order.CurEvaluate,
+		BuyingTime:     "--",
+		RecentEvaluate: "--",
+		UserId: order.UserId,
 	}
 
-	err = service.UpdateCustomerInfo(&c)
+	err = service.DeleteCustomerInfo(&c)
 	//向 juice 表中写
-	err = service.UpdateJuiceWithOrder(&order)
+	err = service.DeleteJuiceDataWithOrder(&order)
 
 	if err != nil {
-		common.Fail(ctx,"更新数据失败 "+err.Error(),nil)
+		common.Fail(ctx,"删除数据失败 "+err.Error(),nil)
 		return
 	}else {
 		common.Success(ctx,"",nil)
@@ -174,7 +176,7 @@ func modifyOrderFunc(ctx *gin.Context){
 	}
 }
 
-func refreshFunc(ctx *gin.Context){
+func refreshOrderFunc(ctx *gin.Context){
 	order:= service.Order{}
 	//获取参数
 	err:=ctx.ShouldBindJSON(&order)
