@@ -26,6 +26,7 @@ func Routers(r *gin.Engine){
 	juice:=r.Group("/juice/")
 	{
 		juice.POST("/refresh", refreshJuiceFunc)
+		juice.POST("/exowner/refresh", refreshExJuiceFunc)
 	}
 	material:=r.Group("/material/")
 	{
@@ -42,18 +43,25 @@ func Routers(r *gin.Engine){
 		inexpense.POST("/add", addInexpenseFunc)
 		inexpense.POST("/refresh", refreshInexpenseFunc)
 		inexpense.POST("/query",queryInexpenseFunc)
+		juice.POST("/exowner/refresh", refreshExInexpenseFunc)
+
+	}
+	exinexpense:=r.Group("/exinexpense/")
+	{
+		exinexpense.POST("/refresh", refreshInexpenseFunc)
 	}
 	alert:=r.Group("/alert/")
 	{
 		alert.POST("/refresh", refreshAlertFunc)
 		alert.POST("/query", queryAlertFunc)
-		alert.POST("/detail", modifyAlertFunc)
+		alert.POST("/receive", receiveAlertFunc)
+		alert.POST("/exOwner/add", sendAlertFunc)
+
 	}
 	owner:=r.Group("/owner/")
 	{
 		owner.POST("/refresh", refreshOwnerFunc)
 		owner.POST("/query", queryOwnerFunc)
-		owner.POST("/detail", modifyOwnerFunc)
 	}
 
 }

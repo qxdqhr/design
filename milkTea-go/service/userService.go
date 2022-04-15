@@ -6,18 +6,19 @@ import (
 	"milkTea/common"
 )
 type User struct {
-	Name    string `json:"name"`
-	Userid    string `json:"userid"`
+	Name      string `json:"name"`
+	Userid    string `json:"user_id" gorm:"column:user_id"`
 	Password  string `json:"password"`
 	Role      string `json:"role"`
 	Telephone string `json:"telephone"`
+	ExOwnerID string `json:"exownerid"" gorm:"column:ex_owner_id"`
 }
 func LoginService(user *User)(error,*User){
 	db:=common.GetDB()
 	db.AutoMigrate(&User{})
 
 	u:=new(User)
-	dbq:=db.First(&u, "userid = ?", user.Userid)
+	dbq:=db.First(&u, "user_id = ?", user.Userid)
 	fmt.Println(u)
 
 	if dbq.RowsAffected<1{//没查到
@@ -49,4 +50,21 @@ func RegisterService(user *User)(error){
 		return nil
 	}
 }
+func GetAllSubOwner(userid string)([]string,error){
+	db:=common.GetDB()
+	db.AutoMigrate(&User{})
+	//判断当前uid是否已存在
+	u:=make([]User,0)
+	dbq:=db.Debug().Find(&u, "ex_owner_id = ?",userid)
+	if dbq.RowsAffected<0{
+		fmt.Println("此经销商没有加盟商")
+		return nil,nil
+	}
+	fmt.Println(u)
+	res:=make([]string,0)
 
+	for _,v:=range u{
+		res = append(res, v.Userid)
+	}
+	return res,nil
+}

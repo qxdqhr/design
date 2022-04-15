@@ -36,17 +36,17 @@ func ResponseDatas(ctx *gin.Context,httpStatus int,code int,msg string,datas int
 	})
 }
 func SuccessDatas(ctx *gin.Context,msg string,datas interface{}){
-	time.Sleep(200 * time.Microsecond)
+	time.Sleep(900 * time.Microsecond)
 
 	ResponseDatas(ctx,http.StatusOK,200,msg,datas)
 }
 func Success(ctx *gin.Context,msg string,data interface{}){
-	time.Sleep(200 * time.Microsecond)
+	time.Sleep(900 * time.Microsecond)
 
 	Response(ctx,http.StatusOK,200,msg,data)
 }
 func Fail(ctx *gin.Context,msg string,data interface{}){
-	time.Sleep(200 * time.Microsecond)
+	time.Sleep(900 * time.Microsecond)
 
 	Response(ctx,http.StatusBadRequest,400,msg,data)
 }

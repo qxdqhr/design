@@ -8,7 +8,7 @@ import (
 
 type Order struct {
 	Id string `json:"orderid"`
-	UserId string `json:"userid"`
+	UserId string `json:"user_id"`
 	CustomerId    string `json:"customerid"`
 	OrderingTime string `json:"orderingtime"`   //下单时间
 	JuiceNumber string `json:"juicenumber"`     //本单饮品数量
@@ -210,7 +210,7 @@ func ModifyOrderInfo(order *Order) (error){
 		return err
 	}
 	//查到了，更新数据
-	dbu := db.Where("id = ?", order.Id).Updates(Order{
+	dbu := db.Debug().Where("id = ?", order.Id).Updates(Order{
 		UserId:            order.UserId,
 		CustomerId:        order.CustomerId,
 		OrderingTime:      order.OrderingTime,

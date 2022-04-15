@@ -7,7 +7,7 @@ import (
 
 type Customer struct {
 	Name    string `json:"name"`
-	UserId string `json:"userid"`
+	UserId string `json:"user_id"`
 	CustomerId    string `json:"customerid"`
 	BuyingTime string `json:"buying_time"`
 	RecentEvaluate string `json:"recent_evaluate"`
@@ -25,7 +25,7 @@ func UpdateCustomerInfo(customer *Customer)(error){
 		db.Create(&customer)
 		fmt.Println("顾客数据已创建")
 	} else if(dbq.RowsAffected == 1){ //有顾客信息，更新顾客信息
-		db.Model(&c).Where("customer_id = ? AND user_id = ?", customer.CustomerId,customer.UserId).Updates(map[string]string{
+		db.Model(&c).Where("customer_id = ? AND user_id = ?", customer.CustomerId,customer.UserId).Updates(map[string]interface{}{
 			"buying_time" :customer.BuyingTime,
 			"recent_evaluate":customer.RecentEvaluate,
 			"user_id":customer.UserId,
@@ -43,7 +43,7 @@ func DeleteCustomerInfo(customer *Customer)(error){
 	dbq:=db.Debug().First(&c, "customer_id = ? AND user_id = ?", customer.CustomerId,customer.UserId)
 
 	if(dbq.RowsAffected == 1){ //有顾客信息，更新顾客信息
-		db.Debug().Model(&c).Where("customer_id = ? AND user_id = ?", customer.CustomerId,customer.UserId).Updates(map[string]string{
+		db.Debug().Model(&c).Where("customer_id = ? AND user_id = ?", customer.CustomerId,customer.UserId).Updates(map[string]interface{}{
 			"buying_time":"--",
 			"recent_evaluate":"--",
 		})

@@ -31,6 +31,11 @@ func loginFunc(ctx *gin.Context)  {
 	//查找数据库
 	err ,resUser = service.LoginService(&user)
 	fmt.Println(user)
+	if user.Role != "ExOwner"{
+		//更新juice表
+		err = service.AddJuiceInfo(user.Userid)
+	}
+
 	if err != nil {
 		common.Fail(ctx,err.Error(),nil)
 	}else{
@@ -40,9 +45,10 @@ func loginFunc(ctx *gin.Context)  {
 		//	common.Fail(ctx,"创建 token 失败",nil)
 		//	return
 		//}
+		fmt.Println("aaaa",resUser.Userid)
 		common.Success(ctx,"登录成功",gin.H{
 			"name":resUser.Name,
-			"userId":resUser.Userid,
+			"user_id":resUser.Userid,
 		})
 	}
 	return
@@ -76,6 +82,15 @@ func registerFunc(ctx *gin.Context)  {
 	user.Password=string(passwordEx)
 	//service
 	err = service.RegisterService(&user)
+	if(user.Role == "Owner"){
+		o:= service.Owner{
+			Userid:        user.Userid,
+			AlertTimes:    0,
+			RecentReason:  "无",
+			ExOwnerUserid: user.ExOwnerID,
+		}
+		err = service.AddOwnerService(o)
+	}
 	//返回信息:工号,和发信息
 	if err != nil {
 		common.Fail(ctx,err.Error(),gin.H{"userid":user.Userid})

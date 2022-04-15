@@ -3,11 +3,13 @@ package service
 import (
 	"fmt"
 	"milkTea/common"
+	"sort"
+	"strconv"
 )
 
 type InputExpense struct {
 	Id string `json:"id"`
-	Userid    string `json:"userid" gorm:"primaryKey"`
+	Userid    string `json:"user_id" gorm:"column:user_id"`
 	Month      string `json:"month"`
 	TotalIncome string `json:"total_income"`
 	TotalExpence string `json:"total_expence"`
@@ -19,11 +21,50 @@ type InputExpense struct {
 	VegetableTeaExpence string `json:"vegetable_tea_expence"`
 	OtherExpence string `json:"other_expence"`
 }
+type IeSort []InputExpense
+
+	//sort
+func (m IeSort) Len() int {
+	return len(m)
+}
+// 实现sort.Interface接口的比较元素方法
+func (m IeSort) Less(i, j int) bool {
+	return m[i].Month < m[j].Month
+}
+// 实现sort.Interface接口的交换元素方法
+func (m IeSort) Swap(i, j int) {
+	m[i], m[j] = m[j], m[i]
+}
+
+func CheckAlert(inputExpense []InputExpense)bool{
+	sort.Sort(IeSort(inputExpense))
+	fmt.Println(inputExpense)
+	isAlert := false
+	lossCount := 0
+	if len(inputExpense)<3 {
+		//不会告警
+		return false
+	}
+
+	for _,ele :=range inputExpense{
+		income,_ :=strconv.ParseFloat(ele.TotalIncome,64)
+		expense,_ :=strconv.ParseFloat(ele.TotalExpence,64)
+		if(income - expense <=0 ) {
+			lossCount++
+		}else{
+			lossCount = 0
+		}
+		if(lossCount >= 3){
+			isAlert = true
+		}
+	}
+	return isAlert
+}
 func RefreshInexpenseInfo(userid string) ([]InputExpense,error){
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ?",userid).Find(&inexpenses)
+	dbs:= db.Where("user_id = ?",userid).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -32,15 +73,11 @@ func RefreshInexpenseInfo(userid string) ([]InputExpense,error){
 
 	return inexpenses,nil
 }
-func AddInexpenseInfo(inputExpense []*InputExpense) (error){
+func AddInexpenseInfo(inputExpense []InputExpense) (error){
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
-	inputExpenses := make([]InputExpense,0)
-	for _,ele := range inputExpense{
-		inputExpenses = append(inputExpenses,*ele)
-	}
-	fmt.Println(inputExpenses)
-	dbc := db.Model(&InputExpense{}).Create(&inputExpenses)
+	//fmt.Println(inputExpense)
+	dbc := db.Debug().Model(&InputExpense{}).Create(&inputExpense)
 	if err := dbc.Error; err!=nil || dbc.RowsAffected < 1{
 		fmt.Println(err)
 		return err
@@ -69,7 +106,7 @@ func QueryInputExpenseMonth(inexpense *InputExpense) ([]InputExpense,error){
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND month = ?",inexpense.Userid,inexpense.Month).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND month = ?",inexpense.Userid,inexpense.Month).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -83,7 +120,7 @@ func QueryInputExpenseTotalIncome(inexpense *InputExpense) ([]InputExpense,error
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND total_income = ?",inexpense.Userid,inexpense.TotalIncome).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND total_income = ?",inexpense.Userid,inexpense.TotalIncome).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -97,7 +134,7 @@ func QueryInputExpenseTotalExpence(inexpense *InputExpense) ([]InputExpense,erro
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND total_expence = ?",inexpense.Userid,inexpense.TotalExpence).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND total_expence = ?",inexpense.Userid,inexpense.TotalExpence).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -111,7 +148,7 @@ func QueryInputExpenseMilkTeaIncome(inexpense *InputExpense) ([]InputExpense,err
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND milk_tea_income = ?",inexpense.Userid,inexpense.MilkTeaIncome).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND milk_tea_income = ?",inexpense.Userid,inexpense.MilkTeaIncome).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -125,7 +162,7 @@ func QueryInputExpenseMilkTeaExpence(inexpense *InputExpense) ([]InputExpense,er
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND milk_tea_expence = ?",inexpense.Userid,inexpense.MilkTeaExpence).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND milk_tea_expence = ?",inexpense.Userid,inexpense.MilkTeaExpence).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -139,7 +176,7 @@ func QueryInputExpenseFruitTeaIncome(inexpense *InputExpense) ([]InputExpense,er
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND fruit_tea_income = ?",inexpense.Userid,inexpense.FruitTeaIncome).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND fruit_tea_income = ?",inexpense.Userid,inexpense.FruitTeaIncome).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -153,7 +190,7 @@ func QueryInputExpenseFruitTeaExpence(inexpense *InputExpense) ([]InputExpense,e
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND fruit_tea_expence = ?",inexpense.Userid,inexpense.FruitTeaExpence).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND fruit_tea_expence = ?",inexpense.Userid,inexpense.FruitTeaExpence).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -167,7 +204,7 @@ func QueryInputExpenseVegetableTeaIncome(inexpense *InputExpense) ([]InputExpens
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND vegetable_tea_income = ?",inexpense.Userid,inexpense.VegetableTeaIncome).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND vegetable_tea_income = ?",inexpense.Userid,inexpense.VegetableTeaIncome).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -181,7 +218,7 @@ func QueryInputExpenseVegetableTeaExpence(inexpense *InputExpense) ([]InputExpen
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND vegetable_tea_expence = ?",inexpense.Userid,inexpense.VegetableTeaExpence).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND vegetable_tea_expence = ?",inexpense.Userid,inexpense.VegetableTeaExpence).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -195,7 +232,7 @@ func QueryInputExpenseOtherExpence(inexpense *InputExpense) ([]InputExpense,erro
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("userid = ? AND other_expence = ?",inexpense.Userid,inexpense.OtherExpence).Find(&inexpenses)
+	dbs:= db.Where("user_id = ? AND other_expence = ?",inexpense.Userid,inexpense.OtherExpence).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -205,4 +242,16 @@ func QueryInputExpenseOtherExpence(inexpense *InputExpense) ([]InputExpense,erro
 	return inexpenses,nil
 }
 
+func GetExOwnerInexpenseInfo(userids []string) ([]InputExpense,error){
+	db:=common.GetDB()
+	db.AutoMigrate(&InputExpense{})
+	inexpenses := []InputExpense{}
+	dbs:= db.Where("user_id = ?",userid).Find(&inexpenses)
+	if err := dbs.Error; err!=nil {
+		fmt.Println(err)
+		return nil,err
+	}
+	//fmt.Println("all inexpenses of ",userid,inexpenses)
 
+	return inexpenses,nil
+}

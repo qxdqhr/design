@@ -142,7 +142,7 @@ func ModifyMaterialInfo(material *Material) (error){
 		return err
 	}
 	//查到了，更新数据
-	dbu := db.Where("material_id = ?", material.MaterialId).Updates(
+	dbu := db.Debug().Where("material_id = ?", material.MaterialId).Updates(
 		Material{
 		MaterialId:      material.MaterialId,
 		MaterialName:    material.MaterialName,

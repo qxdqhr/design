@@ -5,7 +5,7 @@ import (
 )
 
 type DTOLoginAuthorize struct {
-	Userid    string `json:"userid"`
+	User_id    string `json:"user_id"`
 	Role      string `json:"role"`
 }
 func ToReturnLoginAuthorize(u interface{}) DTOLoginAuthorize {

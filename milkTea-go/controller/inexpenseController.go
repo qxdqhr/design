@@ -6,6 +6,7 @@ import (
 	"milkTea/common"
 	"milkTea/service"
 	"strconv"
+	"time"
 )
 
 func addInexpenseFunc(ctx *gin.Context){
@@ -260,9 +261,38 @@ func addInexpenseFunc(ctx *gin.Context){
 		}
 		(*val).TotalExpence = strconv.FormatFloat(total+vegetable+fruit+milk+others,'f',2,64)
 	}
+	inputExpenses := make([]service.InputExpense,0)
+	for _,ele := range inexpenses{
+		inputExpenses = append(inputExpenses,*ele)
+	}
+	fmt.Println(inputExpenses,len(inputExpenses))
+	if len(inputExpenses) != 0 {
+		err = service.AddInexpenseInfo(inputExpenses)
+		//fmt.Println("aaaaaaac",flag )
+		if(	service.CheckReceiveAlert() && service.CheckAlert(inputExpenses)){
+			fmt.Println("aaaaaaab")
+			alert:=service.Alert{
+				Id: "A_AUTO_"+time.Now().Format("2006-01"),
+				AlertTime: time.Now().Format("2006-01"),
+				AlertReason:  "连续三月亏损",
+				AlertMethod:  "提示",
+				AlertOwner:   inputExpenses[0].Userid,
+				AlertExOwner: "无",
+				AlertReceived: "未接受",
+			}
+			fmt.Println("autoAlert:",alert)
+			err = service.AddAlertInfo(alert)
+		}
+	}
 
-	service.AddInexpenseInfo(inexpenses)
+	if err != nil {
+		common.Fail(ctx,"计算数据失败 "+err.Error(),nil)
+		return
+	}else{
+		common.SuccessDatas(ctx,"计算数据成功",nil)
+	}
 }
+
 func refreshInexpenseFunc(ctx *gin.Context){
 	inexpense:= service.InputExpense{}
 	//获取参数
@@ -351,6 +381,31 @@ func queryInexpenseFunc(ctx *gin.Context){
 		common.SuccessDatas(ctx,"未查到数据",inputexpenses)
 	}else{
 		common.SuccessDatas(ctx,"查询数据成功",inputexpenses)
+	}
+
+}
+func refreshExInexpenseFunc(ctx *gin.Context)  {
+	user:= service.User{}
+	//获取参数
+	err:=ctx.ShouldBindJSON(&user)
+	if err!=nil{
+		common.Err("bind error"+err.Error())
+		common.Fail(ctx,"bind error"+err.Error(),nil)
+		return
+	}
+
+	//查询当前所有子分店
+	owners, err := service.GetAllSubOwner(user.Userid)
+	//更新新的榜单数据
+
+	inexpenses,err := service.GetExOwnerInexpenseInfo(owners)
+	//刷新新的榜单数据
+
+	if err != nil {
+		common.Fail(ctx,"刷新数据失败 "+err.Error(),nil)
+		return
+	}else {
+		common.SuccessDatas(ctx,"刷新成功",inexpenses)
 	}
 
 }
