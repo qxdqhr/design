@@ -68,3 +68,19 @@ func GetAllSubOwner(userid string)([]string,error){
 	}
 	return res,nil
 }
+func DeleteOwnerUserInfo(userid string)(error){
+	db:=common.GetDB()
+	db.AutoMigrate(&User{})
+	//判断当前uid是否已存在
+	u:=make([]User,0)
+	dbq:=db.Debug().Where(&u, "ex_owner_id = ?",userid).Delete(User{})
+
+	if(dbq.RowsAffected == 0){
+		return fmt.Errorf("商户不存在")
+	}
+	if err := dbq.Error; err!=nil{
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}

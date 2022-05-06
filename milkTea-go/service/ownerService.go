@@ -6,9 +6,9 @@ import (
 )
 
 type Owner struct {
-	Userid    string `json:"user_id" gorm:"column:user_id"`
-	AlertTimes int `json:"alert_times"`
-	RecentReason string `json:"recent_reason"`
+	Userid    string     `json:"user_id" gorm:"column:user_id"`
+	AlertTimes int       `json:"alert_times"`
+	RecentReason string  `json:"recent_reason"`
 	ExOwnerUserid string `json:"ex_owner_userid" gorm:"column:ex_owner_userid"`
 }
 
@@ -34,7 +34,7 @@ func RefreshOwnerInfo(owner *Owner)([]Owner,error){
 	db:=common.GetDB()
 	db.AutoMigrate(&Owner{})
 	o := []Owner{}
-	dbq := db.Debug().Where("ex_owner_userid = ?", owner.ExOwnerUserid).First(&o)
+	dbq := db.Debug().Where("ex_owner_userid = ?", owner.ExOwnerUserid).Find(&o)
 	if(dbq.RowsAffected >= 1){
 		fmt.Println("商户存在")
 		return o,nil
@@ -46,7 +46,29 @@ func RefreshOwnerInfo(owner *Owner)([]Owner,error){
 		fmt.Println(err)
 		return nil,err
 	}
-	return nil,nil
+
+	return o,nil
+}
+func DeleteOwnerInfo(owner *Owner)(error){
+	db:=common.GetDB()
+	db.AutoMigrate(&Owner{})
+	o := []Owner{}
+	dbq := db.Debug().Where("user_id = ?", owner.Userid).Find(&o)
+	if(dbq.RowsAffected >= 1){
+		fmt.Println("商户存在")
+		dbu := db.Debug().Where("user_id = ?", owner.Userid).Delete(&Owner{})
+		if err := dbu.Error; err!=nil || dbu.RowsAffected <= 0 {
+			fmt.Println(err)
+			return err
+		}
+	}else if(dbq.RowsAffected == 0){
+		return fmt.Errorf("商户不存在")
+	}
+	if err := dbq.Error; err!=nil{
+		fmt.Println(err)
+		return err
+	}
+	return nil
 }
 
 

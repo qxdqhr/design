@@ -87,10 +87,10 @@ func AddInexpenseInfo(inputExpense []InputExpense) (error){
 
 
 }
-func DeleInexpenseInfo() (error){
+func DeleInexpenseInfo(userid string) (error){
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
-	dbd:=db.Where("1 = 1").Delete(&InputExpense{})
+	dbd:=db.Where("user_id = ?",userid).Delete(&InputExpense{})
 	if err := dbd.Error; err!=nil || dbd.RowsAffected < 1{
 		fmt.Println(err)
 		return err
@@ -246,7 +246,7 @@ func GetExOwnerInexpenseInfo(userids []string) ([]InputExpense,error){
 	db:=common.GetDB()
 	db.AutoMigrate(&InputExpense{})
 	inexpenses := []InputExpense{}
-	dbs:= db.Where("user_id = ?",userid).Find(&inexpenses)
+	dbs:= db.Order("month asc").Where("user_id in ?",userids).Find(&inexpenses)
 	if err := dbs.Error; err!=nil {
 		fmt.Println(err)
 		return nil,err
@@ -254,4 +254,16 @@ func GetExOwnerInexpenseInfo(userids []string) ([]InputExpense,error){
 	//fmt.Println("all inexpenses of ",userid,inexpenses)
 
 	return inexpenses,nil
+}
+func DeleteOwnerInExInfo(userId string) (error){
+	db:=common.GetDB()
+	db.AutoMigrate(&InputExpense{})
+
+	//查到了，更新数据
+	dbu := db.Where("user_id = ?",userId).Delete(&InputExpense{})
+	if err := dbu.Error; err!=nil || dbu.RowsAffected <= 0 {
+		fmt.Println(err)
+		return err
+	}
+	return nil
 }

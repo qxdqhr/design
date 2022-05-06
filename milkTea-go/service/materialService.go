@@ -189,3 +189,16 @@ func RefreshMaterialInfo(userid string) ([]Material,error){
 
 	return materials,nil
 }
+
+func DeleteOwnerMaterialInfo(userId string) (error){
+	db:=common.GetDB()
+	db.AutoMigrate(&Material{})
+
+	//查到了，更新数据
+	dbu := db.Where("user_id = ?",userId).Delete(&Material{})
+	if err := dbu.Error; err!=nil || dbu.RowsAffected <= 0 {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}

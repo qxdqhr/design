@@ -10,7 +10,7 @@ import (
 )
 
 func addInexpenseFunc(ctx *gin.Context){
-	service.DeleInexpenseInfo()
+
 	inexpense:= service.InputExpense{}
 	//获取参数
 	err:=ctx.ShouldBindJSON(&inexpense)
@@ -19,6 +19,9 @@ func addInexpenseFunc(ctx *gin.Context){
 		common.Fail(ctx,"bind error"+err.Error(),nil)
 		return
 	}
+	//先清除之前本用户的收支数据
+	service.DeleInexpenseInfo(inexpense.Userid)
+	//重新计算营销数据
 	fmt.Println(inexpense)
 	monthPriceMapper, juiceNumMapper, err := service.GetInexpenseOfOrder(inexpense.Userid) //month，number，price
 	fmt.Println("a",monthPriceMapper)
@@ -281,7 +284,7 @@ func addInexpenseFunc(ctx *gin.Context){
 				AlertReceived: "未接受",
 			}
 			fmt.Println("autoAlert:",alert)
-			err = service.AddAlertInfo(alert)
+			_,err = service.AddAlertInfo(alert)
 		}
 	}
 
@@ -396,8 +399,7 @@ func refreshExInexpenseFunc(ctx *gin.Context)  {
 
 	//查询当前所有子分店
 	owners, err := service.GetAllSubOwner(user.Userid)
-	//更新新的榜单数据
-
+	//更新新的数据
 	inexpenses,err := service.GetExOwnerInexpenseInfo(owners)
 	//刷新新的榜单数据
 

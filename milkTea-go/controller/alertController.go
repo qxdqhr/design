@@ -61,12 +61,12 @@ func sendAlertFunc(ctx *gin.Context){
 		return
 	}
 
-	err = service.AddAlertInfo(alert)
+	res,err := service.AddAlertInfo(alert)
 	if err != nil {
 		common.Fail(ctx,"确认告警失败 "+err.Error(),nil)
 		return
 	}else {
-		common.SuccessDatas(ctx,"确认告警成功",nil)
+		common.SuccessDatas(ctx,"确认告警成功" + res,nil)
 	}
 }
 

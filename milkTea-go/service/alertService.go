@@ -15,21 +15,29 @@ type Alert struct {
 	AlertExOwner string `json:"alert_ex_owner"`
 	AlertReceived string `json:"alert_received"`
 }
-func AddAlertInfo(alert Alert)error{
+func AddAlertInfo(alert Alert)(string,error){
 	db:=common.GetDB()
 	db.AutoMigrate(&Alert{})
 	a:=Alert{}
-	dbq := db.Where("alert_time = ?", alert.AlertTime).First(&a)
-	if(dbq.RowsAffected >= 1){
-		return nil
-	}else if(dbq.RowsAffected == 0){
+	fmt.Print(alert)
+	dbq := db.Debug().Where("alert_time = ? AND alert_owner = ?", alert.AlertTime,alert.AlertOwner).Find(&a)
+	fmt.Print(a)
+	if(dbq.RowsAffected >= 1 && a.AlertReceived == "未确认"){
+		return "该用户现在已经被告警",nil
+	}else {
 		dbc := db.Debug().Create(&alert)
 		if err := dbc.Error; err!=nil || dbc.RowsAffected < 1{
 			fmt.Println(err)
-			return err
+			return "",err
 		}
+		o:=Owner{}
+
+		db.Debug().Model(&Owner{}).Where("user_id = ?", alert.AlertOwner).Find(&o)
+		db.Model(&Owner{}).Where("user_id = ?", alert.AlertOwner).Updates(map[string]interface{}{
+			"alert_times" : o.AlertTimes + 1,
+		})
 	}
-	return nil
+	return "",nil
 }
 
 func CheckReceiveAlert()bool {

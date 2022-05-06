@@ -243,3 +243,21 @@ func DeleteOrderInfo(order *Order) (error){
 	}
 	return nil
 }
+func DeleteOwnerOrdersInfo(userId string) (error){
+	db:=common.GetDB()
+	db.AutoMigrate(&Order{})
+	o := Order{}
+	dbs:= db.Where("user_id = ? ",userId).Find(&o)
+
+	if err := dbs.Error; err!=nil || dbs.RowsAffected == 0 {
+		fmt.Println(err)
+		return err
+	}
+	//查到了，更新数据
+	dbu := db.Where("user_id = ?",userId).Delete(&Order{})
+	if err := dbu.Error; err!=nil || dbu.RowsAffected <= 0 {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}

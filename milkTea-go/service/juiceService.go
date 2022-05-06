@@ -450,3 +450,15 @@ func GetExOwnerJucieInfo(owners []string,userid string)([]Juice,error){
 	}
 	return res,nil
 }
+func DeleteOwnerJuiceInfo(userId string) (error){
+	db:=common.GetDB()
+	db.AutoMigrate(&Juice{})
+
+	//查到了，更新数据
+	dbu := db.Where("user_id = ?",userId).Delete(&Juice{})
+	if err := dbu.Error; err!=nil || dbu.RowsAffected <= 0 {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
