@@ -183,7 +183,7 @@ func customerQueryValidate(query *service.Query)(error){
 	return nil
 }
 func inexpenseQueryValidate(query *service.Query)(error){
-	if query.Func != "inexpsnse" {
+	if query.Func != "inexpense" {
 		return fmt.Errorf("func failed")
 	}
 	switch query.QueryName{
